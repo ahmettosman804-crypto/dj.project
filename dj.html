@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Information Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f4f6f9;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 240px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            color: #bdc3c7;
+            text-decoration: none;
+            display: block;
+            font-size: 16px;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background-color: #34495e;
+            color: #ffffff;
+            border-left: 4px solid #3498db;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Top Header Banner */
+        .header-banner {
+            background-color: #34495e;
+            color: white;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Card Content Container */
+        .card {
+            background-color: white;
+            border-radius: 6px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            min-height: 300px;
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .welcome-text h3 {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .welcome-text p {
+            color: #7f8c8d;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Table Styling for Students Page */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #2980b9;
+            color: white;
+            padding: 12px 15px;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eeeeee;
+            vertical-align: middle;
+            color: #2c3e50;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f9fbfd;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #2980b9;
+        }
+
+        /* Form Controls for Settings Page */
+        .form-group {
+            margin-bottom: 20px;
+            max-width: 600px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-edit { background-color: #2ecc71; color: white; }
+        .btn-edit:hover { background-color: #27ae60; }
+        
+        .btn-delete { background-color: #e74c3c; color: white; }
+        .btn-delete:hover { background-color: #c0392b; }
+
+        .btn-primary { background-color: #2ecc71; color: white; padding: 12px 24px; font-size: 16px; }
+        .btn-primary:hover { background-color: #27ae60; }
+
+        /* Logout Page Specifics */
+        .logout-box {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .logout-title {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .logout-box p {
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+
+        /* Section Visibility Toggle */
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a href="#" id="link-home" class="nav-link active" onclick="switchSection('home')">Home</a>
+        <a href="#" id="link-students" class="nav-link" onclick="switchSection('students')">Students</a>
+        <a href="#" id="link-settings" class="nav-link" onclick="switchSection('settings')">Settings</a>
+        <a href="#" id="link-logout" class="nav-link" onclick="switchSection('logout')">Logout</a>
+    </div>
+
+    <!-- Main Content Dynamic Panels -->
+    <div class="main-content">
+
+        <!-- 1. HOME SECTION -->
+        <div id="sec-home" class="dashboard-section active-section">
+            <div class="header-banner">Welcome to Student Dashboard</div>
+            <div class="card">
+                <div class="welcome-text">
+                    <h3>Hello Administrator 👋</h3>
+                    <p>Use the sidebar to manage students, adjust settings, or securely logout.</p>
+                    <p style="margin-top: 10px;">This dashboard helps you track, update, and organize student information easily.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. STUDENTS SECTION -->
+        <div id="sec-students" class="dashboard-section">
+            <div class="header-banner">Student Information Dashboard</div>
+            <div class="card" style="padding: 20px;">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>ID</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Gender</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><img src="1a.ahmed.jpeg"  alt="Ahmed Cabdikariim" class="avatar"></td>
+                                <td>Ahmed Cabdikariim</td>
+                                <td>C1240001</td>
+                                <td>Hodan</td>
+                                <td>Single</td>
+                                <td>Male</td>
+                                <td><button class="btn btn-edit">Edit</button></td>
+                                <td><button class="btn btn-delete">Delete</button></td>
+                            </tr>
+                            <tr>
+                                <td><img src="2b.anfac.jpeg" alt="Anfac Tahliil" class="avatar"></td>
+                                <td>Anfac Tahliil</td>
+                                <td>C1240002</td>
+                                <td>Kaxda</td>
+                                <td>Married</td>
+                                <td>Female</td>
+                                <td><button class="btn btn-edit">Edit</button></td>
+                                <td><button class="btn btn-delete">Delete</button></td>
+                            </tr>
+                            <tr>
+                                <td><img src="3c.mahamed.jpeg" alt="Mohamed Ahmed" class="avatar"></td>
+                                <td>Mohamed Ahmed</td>
+                                <td>C1240003</td>
+                                <td>Wadajir</td>
+                                <td>Single</td>
+                                <td>Male</td>
+                                <td><button class="btn btn-edit">Edit</button></td>
+                                <td><button class="btn btn-delete">Delete</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. SETTINGS SECTION -->
+        <div id="sec-settings" class="dashboard-section">
+            <div class="header-banner">Settings</div>
+            <div class="card">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">Profile Settings</h3>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Your username">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Your email address">
+                </div>
+                <div class="form-group">
+                    <label for="theme">Theme</label>
+                    <select id="theme">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary">Save Settings</button>
+            </div>
+        </div>
+
+        <!-- 4. LOGOUT SECTION -->
+        <div id="sec-logout" class="dashboard-section">
+            <div class="header-banner">Logout</div>
+            <div class="card" style="display: flex; align-items: center; justify-content: center;">
+                <div class="logout-box">
+                    <div class="logout-title">You are now logged out.</div>
+                    <p>Thank you for using the Student Dashboard. Click below to return to the homepage or log back in.</p>
+                    <button class="btn btn-primary" onclick="switchSection('home')">Return to Home</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript For Switching Active Tabs Smoothly -->
+    <script>
+        function switchSection(sectionId) {
+            const sections = document.querySelectorAll('.dashboard-section');
+            sections.forEach(sec => sec.classList.remove('active-section'));
+            
+            const links = document.querySelectorAll('.nav-link');
+            links.forEach(link => link.classList.remove('active'));
+            
+            document.getElementById('sec-' + sectionId).classList.add('active-section');
+            document.getElementById('link-' + sectionId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
